@@ -9,5 +9,11 @@
             "email": "wesley.lizarti@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "BusinessTime\\": "src/"
+        }
+    }
+
 }
