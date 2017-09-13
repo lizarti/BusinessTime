@@ -1,0 +1,13 @@
+{
+    "name": "lizarti/business-time",
+    "description": "DateTime calculations using Business ranges.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wesley",
+            "email": "wesley.lizarti@gmail.com"
+        }
+    ],
+    "require": {}
+}
