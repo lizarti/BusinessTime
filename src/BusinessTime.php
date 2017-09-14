@@ -183,7 +183,15 @@ class BusinessTime {
 
   }
 
-  private static function getIntervalFromPeriod (Datetime $datetime, $multiplier, $interval) {
+  /**
+   * Get how much intervals a DateTime has in a period of working hours
+   *
+   * @param Datetime $datetime
+   * @param Int $multiplier
+   * @param Int $interval
+   * @return Int
+   */
+  private static function getIntervalFromPeriod (Datetime $datetime, Int $multiplier, Int $interval) : Int {
 
     $currentTime = strtotime($datetime->format('H:i'));
     $dayOfWeek = self::dayOfWeek($datetime);
@@ -231,7 +239,15 @@ class BusinessTime {
     return false;
   }
 
-  public static function moveToNextWorkingDay (Datetime $datetime) {
+
+  /**
+   * Go to the beggining of the next working day
+   *
+   * @param Datetime $datetime
+   * @return Datetime
+   */
+  
+  public static function moveToNextWorkingDay (Datetime $datetime) : Datetime {
 
     $datetime->modify('+1 day');
 
@@ -251,7 +267,13 @@ class BusinessTime {
     }
   }
 
-  private static function beginningOfWorkingTime (Datetime $datetime) {
+  /**
+   * Get the time of the beggining of the working time
+   *
+   * @param Datetime $datetime
+   * @return String
+   */
+  private static function beginningOfWorkingTime (Datetime $datetime) : String {
     
     if (!self::hasWorkingTime($datetime)) {
       return false;
@@ -261,8 +283,8 @@ class BusinessTime {
 
     return self::$days[$dayOfWeek][0][0];
   } 
-
-  private static function hasWorkingTime (Datetime $datetime) {
+  
+  private static function hasWorkingTime (Datetime $datetime) : Bool {
 
     $dayOfWeek = self::dayOfWeek($datetime);
 
@@ -279,8 +301,8 @@ class BusinessTime {
    * @param Array $days
    * @return Array
    */
-
-  public static function setDays (Array $days) {
+  
+  public static function setDays (Array $days) : Array {
     
     self::$days = $days;
     return self::$days;
@@ -294,7 +316,7 @@ class BusinessTime {
    * @return void
    */
 
-  public static function setHolidays (Array $days) {
+  public static function setHolidays (Array $days) : Array {
     self::$days = $days;
     return self::$days;
   }
