@@ -20,7 +20,29 @@ class BusinessTime {
    * @var Array
    */
 
-  protected static $days = [];
+  static $days = [
+    [
+      
+    ],
+    [
+      ['09:00', '17:00']
+    ],
+    [
+      ['09:00', '17:00']
+    ],
+    [
+      ['09:00', '17:00']
+    ],
+    [
+      ['09:00', '12:00']
+    ],
+    [
+      ['09:00', '17:00']
+    ],
+    [
+  
+    ]
+  ];
 
   /**
    * Holidays
@@ -31,7 +53,7 @@ class BusinessTime {
   protected static $holidays = [];
 
   /**
-   * Get the working hours between two DateTime instances
+   * Get the working hours between two working DateTime instances
    *
    * @param DateTime $from
    * @param DateTime $to
@@ -47,12 +69,13 @@ class BusinessTime {
    *
    * @param DateTime $from
    * @param Number $hours
-   * @param String $type
+   * @param String $unit
    * @return DateTime
    */
-  public static function addWorkingHours (DateTime $from, Float $hours, String $type = 'minute') {
+  public static function addWorkingHours (DateTime $from, Float $hours, String $unit = 'minute') {
 
-    switch ($type) {
+
+    switch ($unit) {
       case 'hour': 
         $multiplier = 1;
         break;
@@ -69,10 +92,14 @@ class BusinessTime {
     $interval = floor($hours * $multiplier);
 
     while ($interval > 0) {
-      $from->modify('+1 ' . $type);
-      if (self::isWorkingTime($from)) {
-        $interval--;
+      $decrement = self::getIntervalFromPeriod($from, $multiplier, $interval);
+      
+      if ($decrement == 0) {
+        $from = self::moveToNextWorkingDay($from);
       }
+      $interval -= $decrement;
+      $from->modify('+' . $decrement . ' ' . $unit);
+      
     }
 
     return $from;
@@ -88,8 +115,7 @@ class BusinessTime {
 
   public static function isWorkingDay (DateTime $datetime) {
 
-    $dayOfWeek = self::dayOfWeek($datetime);
-    if ($dayOfWeek === 0 || $dayOfWeek === 6) {
+    if (!self::hasWorkingTime($datetime)) {
       return false;
     }
     return true;
@@ -133,16 +159,18 @@ class BusinessTime {
 
   private static function isTimeBetweenPeriods (DateTime $datetime) {
 
-    $currentTime = strtotime($datetime->format('H:ii'));
+    $currentTime = strtotime($datetime->format('H:i'));
     $dayOfWeek = self::dayOfWeek($datetime);
 
     if (isSet(self::$days[$dayOfWeek])) {
-      $periods = $days[$dayOfWeek];
+      $periods = self::$days[$dayOfWeek];
     } else {
-      throw new \InvalidArgumentException('There is no working time configuration for this day.');
+      return false;
+      // throw new \InvalidArgumentException('There is no working time configuration for this day.');
     }
 
     foreach ($periods AS $period) {
+
       $start = strtotime($period[0]);
       $end = strtotime($period[1]);
 
@@ -152,6 +180,39 @@ class BusinessTime {
     }
 
     return false;
+
+  }
+
+  private static function getIntervalFromPeriod (Datetime $datetime, $multiplier, $interval) {
+
+    $currentTime = strtotime($datetime->format('H:i'));
+    $dayOfWeek = self::dayOfWeek($datetime);
+
+    if (isSet(self::$days[$dayOfWeek])) {
+      $periods = self::$days[$dayOfWeek];
+    } else {
+      return 0;
+      // throw new \InvalidArgumentException('There is no working time configuration for this day.');
+    }
+
+    foreach ($periods AS $period) {
+
+      $start = strtotime($period[0]);
+      $end = strtotime($period[1]);
+
+      if ($currentTime >= $start && $currentTime <= $end) {        
+
+        $diffInterval = floor(($end - $currentTime) / $multiplier);
+
+        if ($interval >= $diffInterval) {
+          return floor(($end - $currentTime) / $multiplier);
+        } else {
+          return $interval - floor(($currentTime - $start) / $multiplier);
+        }
+      }
+    }
+
+    return 0;
 
   }
 
@@ -169,8 +230,50 @@ class BusinessTime {
     }
     return false;
   }
-  
-  /**
+
+  public static function moveToNextWorkingDay (Datetime $datetime) {
+
+    $datetime->modify('+1 day');
+
+    while (!self::isWorkingDay($datetime)) {
+      $datetime->modify('+1 day');
+    }
+
+    $dayOfWeek = self::dayOfWeek($datetime);
+
+    $beginningWorkingtime = self::beginningOfWorkingTime($datetime);
+
+    if ($beginningWorkingtime) {
+      $hour = date('H', strtotime($beginningWorkingtime));
+      $minute = date('i', strtotime($beginningWorkingtime));
+      $nextWorkingDay = $datetime->setTime($hour, $minute);
+      return $nextWorkingDay;
+    }
+  }
+
+  private static function beginningOfWorkingTime (Datetime $datetime) {
+    
+    if (!self::hasWorkingTime($datetime)) {
+      return false;
+    }
+
+    $dayOfWeek = self::dayOfWeek($datetime);
+
+    return self::$days[$dayOfWeek][0][0];
+  } 
+
+  private static function hasWorkingTime (Datetime $datetime) {
+
+    $dayOfWeek = self::dayOfWeek($datetime);
+
+    if (count(self::$days[$dayOfWeek]) != 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+    /**
    * Set days and working times;
    *
    * @param Array $days
@@ -195,6 +298,5 @@ class BusinessTime {
     self::$days = $days;
     return self::$days;
   }
-
 
 }
