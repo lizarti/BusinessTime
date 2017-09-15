@@ -53,7 +53,7 @@ class BusinessTime {
   protected static $holidays = [];
 
   /**
-   * Get the working hours between two working DateTime instances
+   * Get the working hours between two working DateTime
    *
    * @param DateTime $from
    * @param DateTime $to
@@ -107,7 +107,7 @@ class BusinessTime {
   }
 
   /**
-   * Check if is a working day
+   * Check if a DateTime is a working day
    *
    * @param DateTime $datetime
    * @return Boolean
