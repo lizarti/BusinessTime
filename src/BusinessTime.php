@@ -57,10 +57,10 @@ class BusinessTime {
    *
    * @param DateTime $from
    * @param DateTime $to
-   * @return void
+   * @return Float
    */
   
-  public static function getWorkingHours (DateTime $from, DateTime $to) {
+  public static function getWorkingHours (DateTime $from, DateTime $to) : Float {
 
   }
 
@@ -72,7 +72,7 @@ class BusinessTime {
    * @param String $unit
    * @return DateTime
    */
-  public static function addWorkingHours (DateTime $from, Float $hours, String $unit = 'minute') {
+  public static function addWorkingHours (DateTime $from, Float $hours, String $unit = 'minute') : DateTime {
 
 
     switch ($unit) {
@@ -113,7 +113,7 @@ class BusinessTime {
    * @return Boolean
    */
 
-  public static function isWorkingDay (DateTime $datetime) {
+  public static function isWorkingDay (DateTime $datetime) : Bool {
 
     if (!self::hasWorkingTime($datetime)) {
       return false;
@@ -129,7 +129,7 @@ class BusinessTime {
    * @return Integer
    */
 
-  public static function dayOfWeek (DateTime $datetime) {
+  public static function dayOfWeek (DateTime $datetime) : Int {
 
     return $datetime->format('w');
 
@@ -141,7 +141,7 @@ class BusinessTime {
    * @param DateTime $datetime
    * @return Boolean
    */
-  public static function isWorkingTime (DateTime $datetime) {
+  public static function isWorkingTime (DateTime $datetime) : Bool {
 
     if (self::isWorkingDay($datetime)) {
       return self::isTimeBetweenPeriods($datetime);
@@ -157,7 +157,7 @@ class BusinessTime {
    * @return Boolean
    */
 
-  private static function isTimeBetweenPeriods (DateTime $datetime) {
+  private static function isTimeBetweenPeriods (DateTime $datetime) : Bool {
 
     $currentTime = strtotime($datetime->format('H:i'));
     $dayOfWeek = self::dayOfWeek($datetime);
@@ -231,7 +231,7 @@ class BusinessTime {
    * @return boolean
    */
 
-  public static function isHoliday (DateTime $datetime) {
+  public static function isHoliday (DateTime $datetime) : Bool {
     $date = $datetime->format('Y-m-d');
     if (in_array($date, self::$holidays)) {
       return true;
@@ -241,7 +241,7 @@ class BusinessTime {
 
 
   /**
-   * Go to the beggining of the next working day
+   * Go to the beginning of the next working day
    *
    * @param Datetime $datetime
    * @return Datetime

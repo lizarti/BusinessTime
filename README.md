@@ -80,6 +80,15 @@ Return false if one of these conditions is satisfied.*
 
 return `Bool`
 
+
+#### `moveToNextWorkingDay (DateTime $datetime)`
+
+>Go to the beginning of the next working day.
+
+*Beginning is the
+
+return `Bool`
+
 ---
 
 ### Licence
