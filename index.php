@@ -1,51 +1,64 @@
 <?php
 
-require_once "./vendor/autoload.php";
+require_once './vendor/autoload.php';
+require_once './src/helpers.php';
 
 use BusinessTime\BusinessTime;
+
+set_time_limit(2);
 
 $days = [
   [
     
   ],
   [
-    ['07:30', '12:00'], ['13:30', '17:18']
+    ['08:00', '12:00'], ['13:30', '17:30']
   ],
   [
-    ['07:30', '12:00'], ['13:30', '17:18']
+    ['08:00', '12:00'], ['13:30', '17:30']
   ],
   [
-    ['07:30', '12:00'], ['13:30', '22:00']
+    ['08:00', '12:00'], ['13:30', '17:30']
   ],
   [
-    ['08:00', '12:00'], ['13:30', '17:18']
+    ['08:00', '12:00'], ['13:30', '17:30']
   ],
   [
-    ['07:30', '12:00'], ['13:30', '17:18']
+    ['08:00', '12:00'], ['13:30', '17:30']
   ],
   [
 
   ]
 ];
 
-// $log["start"] = microtime(true);
-$now = new DateTime('2018-02-23 11:00');
 $days = BusinessTime::setDays($days);
 
-$next = BusinessTime::moveToNextWorkingDay($now);
+$now = new DateTime('2018-02-23 10:40');
 
-print_r($next);
-
-// $later = BusinessTime::addWorkingHours($now, 400);
+$time = '08:00';
 
 
-// print_r(BusinessTime::moveToNextWorkingDay($now));
+// $next = BusinessTime::moveToNextWorkingDay($now);
 
-// $log["end"] = microtime(true);
-// $log["diff"] = ($log["end"] - $log["start"]);
+// print_r($next);
 
-// echo json_encode($log);
+$start = microtime(true);
 
-// print_r($later);
+// for ($n = 0; $n < 5000; $n++) {
+//   if ($n % 1000 != 0) {
+//     continue;
+//   }
+  // $later = BusinessTime::addWorkingHours($now, $n);
+//   $log[$n]['diff'] = microtime(true) - $start;
+// }
+
+// dd($log);
+
+
+$later = BusinessTime::addWorkingHours($now, 5000);
+// 2022-12-09 10:40:00
+dd(microtime(true) - $start);
+
+// dd($later);
 
 

@@ -5,14 +5,6 @@ namespace BusinessTime;
 use \DateTime AS DateTime;
 
 class BusinessTime {
-  
-  /**
-   * HOUR MULTIPLIER CONSTANTS
-   */
-
-  const HOURS = 1;
-  const MINUTES = 60;
-  const SECONDS = 3600;
 
   /**
    * Working time days configuration
@@ -69,38 +61,39 @@ class BusinessTime {
    *
    * @param DateTime $from
    * @param Number $hours
-   * @param String $unit
    * @return DateTime
    */
-  public static function addWorkingHours (DateTime $from, Float $hours, String $unit = 'minute') : DateTime {
+  public static function addWorkingHours (DateTime $from, Float $hours) : DateTime {
 
-
-    switch ($unit) {
-      case 'hour': 
-        $multiplier = 1;
-        break;
-      case 'minute': 
-        $multiplier = 60;
-        break;
-      case 'second': 
-        $multiplier = 3600;
-        break;
-      default: 
-        $multiplier = 60;
-    }
-
-    $interval = floor($hours * $multiplier);
-
-    while ($interval > 0) {
-      $decrement = self::getIntervalFromPeriod($from, $multiplier, $interval);
+    $amount = $hours * 3600;
+    $qtds = 0;
+    while ($amount > 0) {
+      $decrement = self::getIntervalFromPeriod($from, $amount);
       
       if ($decrement == 0) {
+        $s = microtime(true);
         $from = self::moveToNextWorkingDay($from);
+        $t = microtime(true);
       }
-      $interval -= $decrement;
-      $from->modify('+' . $decrement . ' ' . $unit);
+
+      // dd($decrement);
+      // $from->modify('+' . $decrement . ' ' . $unit);
+      // $from->modify('+' . $decrement . $unit);
+
+      $amount -= $decrement;
       
+      $from->modify('+' . $decrement . ' second');
+
+      // $decrement = intval($decrement / 60);
+      // $from->modify('+' . $decrement . ' minute');
+
+      // dd($amount);
+      
+      $qtds++;
     }
+
+    // dd($qtds);
+    dd(($t - $s));
 
     return $from;
 
@@ -187,16 +180,20 @@ class BusinessTime {
    * Get how much intervals a DateTime has in a period of working hours
    *
    * @param Datetime $datetime
-   * @param Int $multiplier
    * @param Int $interval
    * @return Int
    */
-  private static function getIntervalFromPeriod (Datetime $datetime, Int $multiplier, Int $interval) : Int {
+  private static function getIntervalFromPeriod (Datetime $datetime, Float $amount) : Float {
 
-    $currentTime = strtotime($datetime->format('H:i'));
+    $s = microtime(true);
+
+    $hour = $datetime->format('H');
+    $minute = $datetime->format('i');
+    $current = clone $datetime->setTime($hour, $minute);
+
     $dayOfWeek = self::dayOfWeek($datetime);
 
-    if (isSet(self::$days[$dayOfWeek])) {
+    if (self::hasWorkingTime($datetime)) {
       $periods = self::$days[$dayOfWeek];
     } else {
       return 0;
@@ -205,18 +202,30 @@ class BusinessTime {
 
     foreach ($periods AS $period) {
 
-      $start = strtotime($period[0]);
-      $end = strtotime($period[1]);
+      $startHour = DateTime::createFromFormat('H:i', $period[0])->format('H');
+      $startMinute = DateTime::createFromFormat('H:i', $period[0])->format('i');
 
-      if ($currentTime >= $start && $currentTime <= $end) {        
+      $endHour = DateTime::createFromFormat('H:i', $period[1])->format('H');
+      $endMinute = DateTime::createFromFormat('H:i', $period[1])->format('i');
 
-        $diffInterval = floor(($end - $currentTime) / $multiplier);
+      $start = clone $current;
+      $start->setTime($startHour, $startMinute);
+      $end = clone $current;
+      $end->setTime($endHour, $endMinute);
+      
+      if ($current >= $start && $current <= $end) {    
 
-        if ($interval >= $diffInterval) {
-          return floor(($end - $currentTime) / $multiplier);
+        $interval = ($end->getTimestamp() - $current->getTimestamp());
+
+        $timer = (microtime(true) - $s);
+        // dd($timer * 2501);
+
+        if ($amount > $interval) {
+          return $interval;
         } else {
-          return $interval - floor(($currentTime - $start) / $multiplier);
+          return $amount;
         }
+
       }
     }
 
