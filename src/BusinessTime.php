@@ -107,7 +107,7 @@ class BusinessTime {
   }
 
   /**
-   * Check if is a working day
+   * Check if a DateTime is a working day
    *
    * @param DateTime $datetime
    * @return Boolean
