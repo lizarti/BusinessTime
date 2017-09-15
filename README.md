@@ -57,7 +57,7 @@ BusinessTime::setDays($days);
 ### Methods
 
 
-#### `getWorkingTime (DateTime $from, DateTime $to)`
+#### `getWorkingHours (DateTime $from, DateTime $to)`
 
 >Get the working hours between two working DateTime.
 
@@ -85,7 +85,7 @@ return `Bool`
 
 >Go to the beginning of the next working day.
 
-*Beginning is the
+*This method will necessarily move, at least, to the next working day.*
 
 return `Bool`
 
